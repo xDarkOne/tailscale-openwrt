@@ -299,7 +299,7 @@ while [ "$i" -lt 30 ]; do
     tailscale status 2>&1 | grep -q "Logged out\|NeedsLogin" && break
     i=$((i + 1)); sleep 1
 done
-pgrep -x tailscaled >/dev/null 2>&1 ||
+pgrep tailscaled >/dev/null 2>&1 ||
     die "tailscaled не запустился. Посмотрите: logread | grep -i tailscaled"
 echo "-> Служба запущена и добавлена в автозагрузку."
 
