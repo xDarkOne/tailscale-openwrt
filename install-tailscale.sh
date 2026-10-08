@@ -280,7 +280,9 @@ say "[4/6] Запуск tailscaled..."
 # Перезапускаем только по делу: демон не запущен или сменился fw_mode (он
 # передаётся через env, на лету не подхватится). Иначе повторный прогон
 # скрипта на живом роутере ронял бы узел из тайнета просто так.
-if ! pgrep -x tailscaled >/dev/null 2>&1; then
+# pgrep без -x: busybox 1.37 pgrep -x на OpenWrt не матчит tailscaled
+# (проверено на живом роутере), хотя comm как раз «tailscaled».
+if ! pgrep tailscaled >/dev/null 2>&1; then
     echo "-> Демон не запущен, запускаю."
     /etc/init.d/tailscale start >/dev/null 2>&1
 elif [ "$FW_MODE_OLD" != "nftables" ]; then
@@ -414,7 +416,7 @@ OK=1
 TESTNAME="openwrt.org"
 nslookup "$TESTNAME" >/dev/null 2>&1 || { echo " [!] резолв не работает"; OK=0; }
 ip r 2>/dev/null | grep -q "^default .*dev tailscale" && { echo " [!] дефолтный маршрут уехал в тайнет"; OK=0; }
-pgrep -x tailscaled >/dev/null 2>&1 || { echo " [!] tailscaled не запущен"; OK=0; }
+pgrep tailscaled >/dev/null 2>&1 || { echo " [!] tailscaled не запущен"; OK=0; }
 
 if [ "$OK" != "1" ]; then
     if [ -n "$RESOLV_BAK" ]; then
